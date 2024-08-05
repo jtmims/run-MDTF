@@ -24,17 +24,7 @@ fi
 echo "looking for catalog in $ppdir"
 cat=$(grep -s -H "esmcat_version" $ppdir/*.json  | cut -d: -f1)
 if [[ "$cat" == "" ]]; then
-   exit #TODO: fix catalog builder for given dir
-   #generate catalog
-   echo "catalog not found in $ppdir, building new one"
-   config="- /path/to/pp/dir/pp"
-   config_edit="- ${ppdir::-1}"
-   sed -e "s|$config|$config_edit|ig" ./cat_build_config.yml > cat_config.yml
-   config="output_dir:"
-   config_edit="output_dir: ${ppdir::-1}"
-   sed -i "s|$config|$config_edit|ig" ./cat_config.yml
-   python3 "$mdtf_dir"/tools/catalog_builder/catalog_builder.py --config cat_config.yml
-   cat="${ppdir}cat.json"
+   exit #TODO: add GFDL catalog builder functionality
    echo "new catalog: $cat"
 else
    echo "found catalog: $cat"
