@@ -1,21 +1,39 @@
 #!/usr/bin/env bash
+#set -x
 
-# TODO: reference GFDL MDTF install
-mdtf_dir=/home/oar.gfdl.mdtf/mdtf/MDTF-diagnostics
-#mdtf_dir=/home/Jacob.Mims/mdtf/MDTF-diagnostics
+# references
+run_dir=/nbhome/Jacob.Mims/run-MDTF
+#mdtf_dir=/home/oar.gfdl.mdtf/mdtf/MDTF-diagnostics
+mdtf_dir=/home/Jacob.Mims/mdtf/MDTF-diagnostics
+genintakegfdl=/home/Jacob.Mims/CatalogBuilder/catalogbuilder/scripts/gen_intake_gfdl.py
+
+#TEST: /archive/jpk/fre/FMS2024.02_OM5_20240819/CM4.5v01_om5b06_piC_noBLING_xrefine_test4/gfdl.ncrc5-intel23-prod-openmp/pp/
+
+#TEST 2: /archive/djp/am5/am5f7b12r1/c96L65_am5f7b12r1_amip/gfdl.ncrc5-intel23-classic-prod-openmp/pp/
 
 # handle arguments
-if [[ $# -eq 0 ]] ; then
-    echo "USAGE: sh run-mdtf.sh /path/to/pp/dir/pp"
+if [[ $# -ne 4 ]] ; then
+    echo "USAGE: sh run-mdtf.sh /path/to/pp/dir/pp out_dir/mdtf startyr endyr"
     exit 0
 fi
 if [ -d $1 ]; then
    ppdir=$1
 else
    echo "ERROR: $1 is not a directory"
-   echo "USAGE: sh run-mdtf.sh /path/to/pp/dir/pp"
+   echo "USAGE: sh run-mdtf.sh /path/to/pp/dir/pp out_dir/mdtf startyr endyr"
    exit
 fi
+if [ -d $2 ]; then
+   outdir=$2
+else
+   mkdir -p $2
+   outdir=$2
+fi
+startyr=$3
+endyr=$4
+
+# load modules
+module load miniforge
 
 # check to see if catalog exists
 #  ^..^
@@ -24,18 +42,22 @@ fi
 echo "looking for catalog in $ppdir"
 cat=$(grep -s -H "esmcat_version" $ppdir/*.json  | cut -d: -f1)
 if [[ "$cat" == "" ]]; then
-   exit #TODO: add GFDL catalog builder functionality
-   echo "new catalog: $cat"
+   conda activate /nbhome/Aparna.Radhakrishnan/conda/envs/catalogbuilder
+   python $genintakegfdl $ppdir $outdir/catalog
+   cat=$outdir/catalog.json
+   echo "new catalog generated: $cat"
 else
    echo "found catalog: $cat"
 fi
 
-# launch mdtf
+# handle atmos_cmip PODs
+cp $run_dir/config/atmos_cmip_config.jsonc $outdir/atmos_cmip_config.jsonc
 config='"DATA_CATALOG": "",'
 config_edit='"DATA_CATALOG": "'"${cat}"'",'
-sed -e "s|$config|$config_edit|ig" ./amip_runtime.jsonc > config.jsonc
-echo "edited DATA_CATALOG in config file"
-echo "launching MDTF"
-
-"$mdtf_dir"/mdtf -f config.jsonc
-# move results to nbhome
+sed -i "s|$config|$config_edit|ig" $outdir/atmos_cmip_config.jsonc
+config='"WORK_DIR": "",'
+config_edit='"WORK_DIR": "'"${outdir}"'",'
+sed -i "s|$config|$config_edit|ig" $outdir/atmos_cmip_config.jsonc
+echo "edited atmos_cmip config file"
+echo "launching MDTF with atmos_cmip config file"
+"$mdtf_dir"/mdtf -f $outdir/atmos_cmip_config.jsonc
