@@ -32,9 +32,6 @@ fi
 startyr=$3
 endyr=$4
 
-# load modules
-module load miniforge
-
 # check to see if catalog exists
 #  ^..^
 # /o  o\   
@@ -42,7 +39,9 @@ module load miniforge
 echo "looking for catalog in $ppdir"
 cat=$(grep -s -H "esmcat_version" $ppdir/*.json  | cut -d: -f1)
 if [[ "$cat" == "" ]]; then
-   conda activate /nbhome/Aparna.Radhakrishnan/conda/envs/catalogbuilder
+   activate=/home/oar.gfdl.mdtf/miniconda3/bin/activate
+   env=/nbhome/Aparna.Radhakrishnan/conda/envs/catalogbuilder
+   source $activate $env 
    python $genintakegfdl $ppdir $outdir/catalog
    cat=$outdir/catalog.json
    echo "new catalog generated: $cat"
