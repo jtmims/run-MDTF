@@ -58,6 +58,12 @@ sed -i "s|$config|$config_edit|ig" $outdir/atmos_cmip_config.jsonc
 config='"WORK_DIR": "",'
 config_edit='"WORK_DIR": "'"${outdir}"'",'
 sed -i "s|$config|$config_edit|ig" $outdir/atmos_cmip_config.jsonc
+config='"startdate": "",'
+config_edit='"startdate": "'"${startyr}"'",'
+sed -i "s|$config|$config_edit|ig" $outdir/atmos_cmip_config.jsonc
+config='"enddate": ""'
+config_edit='"enddate": "'"${endyr}"'"'
+sed -i "s|$config|$config_edit|ig" $outdir/atmos_cmip_config.jsonc
 echo "edited atmos_cmip config file"
 echo "launching MDTF with atmos_cmip config file"
 "$mdtf_dir"/mdtf -f $outdir/atmos_cmip_config.jsonc
