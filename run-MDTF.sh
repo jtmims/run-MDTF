@@ -1,7 +1,9 @@
-#!/usr/bin/env bash
+#!/bin/bash -f
+#SBATCH --job-name=run-MDTF.sh
+#SBATCH --time=4:00:00
 #set -x
 
-# references
+# dir references
 run_dir=/nbhome/Jacob.Mims/run-MDTF
 #mdtf_dir=/home/oar.gfdl.mdtf/mdtf/MDTF-diagnostics
 mdtf_dir=/home/Jacob.Mims/mdtf/MDTF-diagnostics
@@ -66,3 +68,5 @@ sed -i "s|$config|$config_edit|ig" $outdir/atmos_cmip_config.jsonc
 echo "edited atmos_cmip config file"
 echo "launching MDTF with atmos_cmip config file"
 "$mdtf_dir"/mdtf -f $outdir/atmos_cmip_config.jsonc
+
+exit 0
