@@ -5,8 +5,8 @@
 
 # dir references
 run_dir=/nbhome/Jacob.Mims/run-MDTF
-#mdtf_dir=/home/oar.gfdl.mdtf/mdtf/MDTF-diagnostics
-mdtf_dir=/home/Jacob.Mims/mdtf/MDTF-diagnostics
+mdtf_dir=/home/oar.gfdl.mdtf/mdtf/MDTF-diagnostics
+#mdtf_dir=/home/Jacob.Mims/mdtf/MDTF-diagnostics for testing
 genintakegfdl=/home/Jacob.Mims/CatalogBuilder/catalogbuilder/scripts/gen_intake_gfdl.py
 
 #TEST: /archive/jpk/fre/FMS2024.02_OM5_20240819/CM4.5v01_om5b06_piC_noBLING_xrefine_test4/gfdl.ncrc5-intel23-prod-openmp/pp/
