@@ -4,9 +4,9 @@
 #set -x
 
 # dir references
-run_dir=/nbhome/Jacob.Mims/run-MDTF
-mdtf_dir=/home/oar.gfdl.mdtf/mdtf/MDTF-diagnostics
-#mdtf_dir=/home/Jacob.Mims/mdtf/MDTF-diagnostics for testing
+run_dir=/home/Jacob.Mims/run-MDTF
+#mdtf_dir=/home/oar.gfdl.mdtf/mdtf/MDTF-diagnostics
+mdtf_dir=/home/Jacob.Mims/mdtf/MDTF-diagnostics
 genintakegfdl=/home/Jacob.Mims/CatalogBuilder/catalogbuilder/scripts/gen_intake_gfdl.py
 
 #TEST: /archive/jpk/fre/FMS2024.02_OM5_20240819/CM4.5v01_om5b06_piC_noBLING_xrefine_test4/gfdl.ncrc5-intel23-prod-openmp/pp/
@@ -51,14 +51,27 @@ else
    echo "found catalog: $cat"
 fi
 
+# intial handling of config files
+declare -a files=(
+[0]="atmos_cmip_config.jsonc"
+)
+if [ $startyr -le 2003 ] && [ $endyr -ge 2014 ]; then
+   echo "test"
+   files=("${files[@]}"  "atmos_cmip_ffb.jsonc")
+fi
+echo ${files[@]}
+for f in "${files[@]}" ; do
+   cp $run_dir/config/$f $outdir/$f
+   config='"DATA_CATALOG": "",'
+   config_edit='"DATA_CATALOG": "'"${cat}"'",'
+   sed -i "s|$config|$config_edit|ig" $outdir/$f
+   config='"WORK_DIR": "",'
+   config_edit='"WORK_DIR": "'"${outdir}"'",'
+   sed -i "s|$config|$config_edit|ig" $outdir/$f
+done
+
+
 # handle atmos_cmip PODs
-cp $run_dir/config/atmos_cmip_config.jsonc $outdir/atmos_cmip_config.jsonc
-config='"DATA_CATALOG": "",'
-config_edit='"DATA_CATALOG": "'"${cat}"'",'
-sed -i "s|$config|$config_edit|ig" $outdir/atmos_cmip_config.jsonc
-config='"WORK_DIR": "",'
-config_edit='"WORK_DIR": "'"${outdir}"'",'
-sed -i "s|$config|$config_edit|ig" $outdir/atmos_cmip_config.jsonc
 config='"startdate": "",'
 config_edit='"startdate": "'"${startyr}"'",'
 sed -i "s|$config|$config_edit|ig" $outdir/atmos_cmip_config.jsonc
@@ -68,5 +81,10 @@ sed -i "s|$config|$config_edit|ig" $outdir/atmos_cmip_config.jsonc
 echo "edited atmos_cmip config file"
 echo "launching MDTF with atmos_cmip config file"
 "$mdtf_dir"/mdtf -f $outdir/atmos_cmip_config.jsonc
+
+# handle atmos_cmip_ffb
+if [ -f $outdir/atmos_cmip_ffb.jsonc ]; then
+   "$mdtf_dir"/mdtf -f $ourdir/atmos_cmip_ffb.jsonc
+fi
 
 exit 0
