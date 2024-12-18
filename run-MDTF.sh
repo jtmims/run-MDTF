@@ -13,16 +13,20 @@ genintakegfdl=/home/Jacob.Mims/CatalogBuilder/catalogbuilder/scripts/gen_intake_
 
 #TEST 2: /archive/djp/am5/am5f7b12r1/c96L65_am5f7b12r1_amip/gfdl.ncrc5-intel23-classic-prod-openmp/pp/
 
+usage() {
+   echo "USAGE: run-mdtf.sh /path/to/pp/dir/pp out_dir/mdtf startyr endyr"   
+}
+
 # handle arguments
 if [[ $# -ne 4 ]] ; then
-    echo "USAGE: sh run-mdtf.sh /path/to/pp/dir/pp out_dir/mdtf startyr endyr"
+    usage
     exit 0
 fi
 if [ -d $1 ]; then
    ppdir=$1
 else
    echo "ERROR: $1 is not a directory"
-   echo "USAGE: sh run-mdtf.sh /path/to/pp/dir/pp out_dir/mdtf startyr endyr"
+   usage
    exit
 fi
 if [ -d $2 ]; then
@@ -51,12 +55,12 @@ else
    echo "found catalog: $cat"
 fi
 
-# intial handling of config files
+# edit config files and launch them
 declare -a files=(
 [0]="atmos_cmip_config.jsonc"
+[1]="ice_config.jsonc"
 )
 if [ $startyr -le 2003 ] && [ $endyr -ge 2014 ]; then
-   echo "test"
    files=("${files[@]}"  "atmos_cmip_ffb.jsonc")
 fi
 echo ${files[@]}
@@ -68,23 +72,18 @@ for f in "${files[@]}" ; do
    config='"WORK_DIR": "",'
    config_edit='"WORK_DIR": "'"${outdir}"'",'
    sed -i "s|$config|$config_edit|ig" $outdir/$f
+   # handle atmos_cmip PODs
+   config='"startdate": "",'
+   config_edit='"startdate": "'"${startyr}"'",'
+   sed -i "s|$config|$config_edit|ig" $outdir/$f
+   config='"enddate": ""'
+   config_edit='"enddate": "'"${endyr}"'"'
+   sed -i "s|$config|$config_edit|ig" $outdir/$f
+   echo "edited atmos_cmip config file"
+   echo "launching MDTF with $f"
+   "$mdtf_dir"/mdtf -f $outdir/$f
 done
 
-
-# handle atmos_cmip PODs
-config='"startdate": "",'
-config_edit='"startdate": "'"${startyr}"'",'
-sed -i "s|$config|$config_edit|ig" $outdir/atmos_cmip_config.jsonc
-config='"enddate": ""'
-config_edit='"enddate": "'"${endyr}"'"'
-sed -i "s|$config|$config_edit|ig" $outdir/atmos_cmip_config.jsonc
-echo "edited atmos_cmip config file"
-echo "launching MDTF with atmos_cmip config file"
-"$mdtf_dir"/mdtf -f $outdir/atmos_cmip_config.jsonc
-
-# handle atmos_cmip_ffb
-if [ -f $outdir/atmos_cmip_ffb.jsonc ]; then
-   "$mdtf_dir"/mdtf -f $ourdir/atmos_cmip_ffb.jsonc
-fi
+# TODO: add clean up methods to move all ouput into one MDTF_output dir
 
 exit 0
