@@ -17,10 +17,14 @@ usage() {
    echo "USAGE: run-mdtf.sh /path/to/pp/dir/pp out_dir/mdtf startyr endyr"   
 }
 
+mapfile -t pods < $run_dir/pods.txt
+
+echo ${pods[@]}
+
 # handle arguments
 if [[ $# -ne 4 ]] ; then
-    usage
-    exit 0
+   usage
+   exit 0
 fi
 if [ -d $1 ]; then
    ppdir=$1
@@ -55,7 +59,7 @@ else
    echo "found catalog: $cat"
 fi
 
-# edit config files and launch them
+# edit config files
 declare -a files=(
 [0]="atmos_cmip_config.jsonc"
 [1]="ice_config.jsonc"
@@ -63,7 +67,6 @@ declare -a files=(
 if [ $startyr -le 2003 ] && [ $endyr -ge 2014 ]; then
    files=("${files[@]}"  "atmos_cmip_ffb.jsonc")
 fi
-echo ${files[@]}
 for f in "${files[@]}" ; do
    cp $run_dir/config/$f $outdir/$f
    config='"DATA_CATALOG": "",'
@@ -79,11 +82,35 @@ for f in "${files[@]}" ; do
    config='"enddate": ""'
    config_edit='"enddate": "'"${endyr}"'"'
    sed -i "s|$config|$config_edit|ig" $outdir/$f
-   echo "edited atmos_cmip config file"
-   echo "launching MDTF with $f"
-   "$mdtf_dir"/mdtf -f $outdir/$f
+   echo "edited file $f"
 done
 
-# TODO: add clean up methods to move all ouput into one MDTF_output dir
+# launch the mdtf with the config files
+for f in "${files[@]}" ; do
+   if [ -f $outdir/$f ]; then
+      echo "launching MDTF with $f"
+      "$mdtf_dir"/mdtf -f $outdir/$f
+   fi
+done
+
+# consolidate into a single output folder
+mapfile -t pods < $run_dir/pods.txt
+for od in "$outdir"/"MDTF_output.v"*; do
+   for pd in $od/*; do
+      if [ -d $pd ]; then
+         pod=$(basename "$pd")
+         for name in ${pods[@]}; do
+            if [[ "$pod" == "$name" ]]; then
+              mv $pd "$outdir"/"MDTF_output"
+            fi
+         done
+      fi
+   done
+   if [ -f "$od"/"index.html" ]; then
+      cat "$od"/"index.html" >> "$outdir"/"MDTF_output"/"index.html"
+   fi
+   rm -rf $od
+done
+
 
 exit 0
