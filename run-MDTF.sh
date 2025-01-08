@@ -7,7 +7,7 @@
 run_dir=/home/Jacob.Mims/run-MDTF
 #mdtf_dir=/home/oar.gfdl.mdtf/mdtf/MDTF-diagnostics
 mdtf_dir=/home/Jacob.Mims/mdtf/MDTF-diagnostics
-genintakegfdl=/home/Jacob.Mims/CatalogBuilder/catalogbuilder/scripts/gen_intake_gfdl.py
+catbuilddir=/home/Jacob.Mims/CatalogBuilder/
 
 #TEST: /archive/jpk/fre/FMS2024.02_OM5_20240819/CM4.5v01_om5b06_piC_noBLING_xrefine_test4/gfdl.ncrc5-intel23-prod-openmp/pp/
 
@@ -52,7 +52,7 @@ if [[ "$cat" == "" ]]; then
    activate=/home/oar.gfdl.mdtf/miniconda3/bin/activate
    env=/nbhome/Aparna.Radhakrishnan/conda/envs/catalogbuilder
    source $activate $env 
-   python $genintakegfdl $ppdir $outdir/catalog
+   python $run_dir/scripts/cat_builder.py $catbuilddir $ppdir $outdir/catalog
    cat=$outdir/catalog.json
    echo "new catalog generated: $cat"
 else
@@ -111,6 +111,5 @@ for od in "$outdir"/"MDTF_output.v"*; do
    fi
    rm -rf $od
 done
-
 
 exit 0
