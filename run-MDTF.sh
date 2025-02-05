@@ -59,6 +59,12 @@ else
    echo "found catalog: $cat"
 fi
 
+# search catalog for pod requirements
+activate=/home/oar.gfdl.mdtf/miniconda3/bin/activate
+env=/home/oar.gfdl.mdtf/miniconda3/envs/_MDTF_base
+source $activate $env
+python $run_dir/scripts/req_var_search.py $cat
+
 # edit config files
 declare -a files=(
 [0]="atmos_cmip_config.jsonc"
@@ -94,7 +100,7 @@ for f in "${files[@]}" ; do
 done
 
 # consolidate into a single output folder
-mapfile -t pods < $run_dir/pods.txt
+mapfile -t pods < $run_dir/data/pods.txt
 for od in "$outdir"/"MDTF_output.v"*; do
    for pd in $od/*; do
       if [ -d $pd ]; then

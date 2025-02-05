@@ -1,0 +1,15 @@
+{
+  "pods": {
+    "Wheeler_Kiladis": {
+      "realm": "atmos_cmip",
+      "frequency": "day",
+      "vars": {
+        "rlut": "",
+        "pr": "",
+        "wap500": "",
+        "ua200": "",
+        "ua850": ""
+      }
+    }
+  }
+}
