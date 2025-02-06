@@ -2,13 +2,14 @@
 
 import json
 import sys
+import os
 import intake 
 
 # load catalog
 cat = intake.open_esm_datastore(sys.argv[1])
 
 # load req_variables
-with open('../data/req_var.json') as f:
+with open(sys.argv[2]+"req_var.json") as f:
     req_vars = json.load(f)
 
 pod_passed = {}
@@ -26,7 +27,7 @@ for p in req_vars['pods']:
             pod_passed[p] = False
             print(f'WARNING: catalog is missing variable {v}; skipping POD {p}!')
 
-with open("../data/runnable_pods.txt", "w") as f:
+with open(sys.argv[2]+"runnable_pods.txt", "w") as f:
     for p in pod_passed:
         if pod_passed[p] == True:
             f.write(p + "\n")

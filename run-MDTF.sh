@@ -4,10 +4,12 @@
 #set -x
 
 # dir references
-run_dir=/home/Jacob.Mims/run-MDTF
+run_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 #mdtf_dir=/home/oar.gfdl.mdtf/mdtf/MDTF-diagnostics
 mdtf_dir=/home/Jacob.Mims/mdtf/MDTF-diagnostics
 catbuilddir=/home/Jacob.Mims/CatalogBuilder/
+
+echo $run_dir
 
 #TEST: /archive/jpk/fre/FMS2024.02_OM5_20240819/CM4.5v01_om5b06_piC_noBLING_xrefine_test4/gfdl.ncrc5-intel23-prod-openmp/pp/
 
@@ -16,10 +18,6 @@ catbuilddir=/home/Jacob.Mims/CatalogBuilder/
 usage() {
    echo "USAGE: run-mdtf.sh /path/to/pp/dir/pp out_dir/mdtf startyr endyr"   
 }
-
-mapfile -t pods < $run_dir/pods.txt
-
-echo ${pods[@]}
 
 # handle arguments
 if [[ $# -ne 4 ]] ; then
@@ -63,9 +61,12 @@ fi
 activate=/home/oar.gfdl.mdtf/miniconda3/bin/activate
 env=/home/oar.gfdl.mdtf/miniconda3/envs/_MDTF_base
 source $activate $env
-python $run_dir/scripts/req_var_search.py $cat
+python $run_dir/scripts/req_var_search.py $cat $run_dir/data/
 
-# edit config files
+# make list of pre-canned config files to use
+mapfile -t runnable_pods < $run_dir/data/runnable_pods.txt
+echo $runnable_pods
+
 declare -a files=(
 [0]="atmos_cmip_config.jsonc"
 [1]="ice_config.jsonc"
@@ -73,6 +74,8 @@ declare -a files=(
 if [ $startyr -le 2003 ] && [ $endyr -ge 2014 ]; then
    files=("${files[@]}"  "atmos_cmip_ffb.jsonc")
 fi
+
+# edit config files
 for f in "${files[@]}" ; do
    cp $run_dir/config/$f $outdir/$f
    config='"DATA_CATALOG": "",'
