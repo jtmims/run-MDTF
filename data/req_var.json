@@ -3,13 +3,12 @@
     "Wheeler_Kiladis": {
       "realm": "atmos_cmip",
       "frequency": "day",
-      "vars": {
-        "rlut": "",
-        "pr": "",
-        "wap500": "",
-        "ua200": "",
-        "ua850": ""
-      }
+      "vars": ["rlut","pr","wap500","ua200","ua850"]
+    },
+    "MJO_suite": {
+      "realm": "atmos_cmip",
+      "frequency": "day",
+      "vars": ["rlut","pr","ua200","ua850","va200","va850"]
     }
   }
 }
