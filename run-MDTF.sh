@@ -61,7 +61,7 @@ fi
 activate=/home/oar.gfdl.mdtf/miniconda3/bin/activate
 env=/home/oar.gfdl.mdtf/miniconda3/envs/_MDTF_base
 source $activate $env
-python $run_dir/scripts/req_var_search.py $cat $run_dir/data/
+python $run_dir/scripts/req_var_search.py $cat $run_dir/data/ $outdir
 
 # make list of pre-canned config files to use
 mapfile -t runnable_pods < $run_dir/data/runnable_pods.txt

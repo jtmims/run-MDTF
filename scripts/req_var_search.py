@@ -31,5 +31,5 @@ for p in req_vars:
         del req_vars[p]['vars']
         runnable_pods[p] = req_vars[p]
 
-with open(sys.argv[2]+"runnable_pods.json", "w") as f:
+with open(sys.argv[3]+"runnable_pods.json", "w") as f:
     f.write(json.dumps(runnable_pods, indent=2))
