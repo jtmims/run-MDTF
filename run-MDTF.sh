@@ -37,6 +37,9 @@ else
    mkdir -p $2
    outdir=$2
 fi
+if ! [ -d $outdir/config ]; then
+   mkdir -p $outdir/config
+fi
 startyr=$3
 endyr=$4
 
@@ -61,12 +64,33 @@ fi
 activate=/home/oar.gfdl.mdtf/miniconda3/bin/activate
 env=/home/oar.gfdl.mdtf/miniconda3/envs/_MDTF_base
 source $activate $env
-python $run_dir/scripts/req_var_search.py $cat $run_dir/data/ $outdir
+python $run_dir/scripts/req_var_search.py $cat $run_dir/data/ $outdir/
 
-# make list of pre-canned config files to use
-mapfile -t runnable_pods < $run_dir/data/runnable_pods.txt
-echo $runnable_pods
+# edit template config file
+cp $run_dir/config/template_config.jsonc $outdir
+f=$outdir/template_config.jsonc
+if [ ! -f $f ]; then
+   echo "ERROR: failed to find $f; error with req_var_search.py"
+   exit 0
+fi
+config='"DATA_CATALOG": "",'
+config_edit='"DATA_CATALOG": "'"${cat}"'",'
+sed -i "s|$config|$config_edit|ig" $f
+config='"WORK_DIR": "",'
+config_edit='"WORK_DIR": "'"${outdir}"'",'
+sed -i "s|$config|$config_edit|ig" $f
+config='"startdate": "",'
+config_edit='"startdate": "'"${startyr}"'",'
+sed -i "s|$config|$config_edit|ig" $f
+config='"enddate": ""'
+config_edit='"enddate": "'"${endyr}"'"'
+sed -i "s|$config|$config_edit|ig" $f
+echo "edited file $f"
 
+#generate config files
+python $run_dir/scripts/gen_config.py $outdir/
+
+exit 0 
 declare -a files=(
 [0]="atmos_cmip_config.jsonc"
 [1]="ice_config.jsonc"

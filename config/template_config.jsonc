@@ -1,19 +1,15 @@
 {
-  "pod_list" : [
-      //"example"
-     "MJO_suite",
-     "Wheeler_Kiladis"
-   ],
-   "case_list":
-    {
-      "atmos_cmip":
-        {
-          "model": "test",
-          "convention": "CMIP",
-          "startdate": "",
-          "enddate": ""
-        }
-    },
+  "pod_list" : [],
+  "case_list":
+   {
+     "atmos_cmip":
+      {
+        "model": "test",
+        "convention": "CMIP",
+        "startdate": "",
+        "enddate": ""
+      }
+   },
   "DATA_CATALOG": "",
 
   "OBS_DATA_ROOT": "/home/oar.gfdl.mdtf/mdtf/inputdata/obs_data",

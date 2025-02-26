@@ -4,7 +4,7 @@ import os
 import json
 
 # load pod information
-with open(sys.argv[2]+'runnable_pods.json') as f:
+with open(sys.argv[1]+'runnable_pods.json') as f:
     pods = json.load(f)
 
 # load template config information
@@ -23,5 +23,5 @@ for p in pods:
     config_files[config_file]['pod_list'].append(p) 
 
 for c in config_files:
-    with open(sys.argv[2]+f"{c}.jsonc", "w") as f:
+    with open(sys.argv[1]+f"config/{c}.jsonc", "w") as f:
         f.write(json.dumps(config_files[c], indent=2))     
