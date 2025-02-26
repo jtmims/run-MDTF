@@ -16,7 +16,8 @@ def create_catalog(input_path=input_path,output_path=output_path):
     csv, json = gen_intake_gfdl.create_catalog(
                                                input_path=input_path,
                                                output_path=output_path,
-                                               verbose=False
+                                               verbose=False,
+                                               overwrite=True
                                               )
     return(csv,json)
 
