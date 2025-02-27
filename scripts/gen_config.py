@@ -13,14 +13,20 @@ with open(sys.argv[1]+'template_config.jsonc') as f:
 
 # get list of requested config file names and create dict objects for each
 config_names = set([f"{pods[p]['realm']}_{pods[p]['frequency']}_config" for p in pods])
+realms = set([f"{pods[p]['realm']}" for p in pods])
 config_files = {}
 for c in config_names:
-    config_files[c] = template_config    
+    config_files[c] = template_config
+    for r in realms:
+        if r in c:
+            config_files[c]['case_list']['case_name']['realm'] = r
+            config_files[c]['case_list'][r] = config_files[c]['case_list'].pop('case_name')
 
 # add pods to cooresponding config file
 for p in pods:
     config_file = f"{pods[p]['realm']}_{pods[p]['frequency']}_config"    
     config_files[config_file]['pod_list'].append(p) 
+    
 
 for c in config_files:
     with open(sys.argv[1]+f"config/{c}.jsonc", "w") as f:

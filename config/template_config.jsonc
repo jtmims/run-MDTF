@@ -2,12 +2,13 @@
   "pod_list" : [],
   "case_list":
    {
-     "atmos_cmip":
+     "case_name":
       {
         "model": "test",
         "convention": "CMIP",
         "startdate": "",
-        "enddate": ""
+        "enddate": "",
+        "realm": ""
       }
    },
   "DATA_CATALOG": "",
