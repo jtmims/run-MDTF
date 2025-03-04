@@ -8,5 +8,10 @@
     "realm": "atmos_cmip",
     "frequency": "day",
     "vars": ["rlut","pr","ua200","ua850","va200","va850"]
+  },
+  "forcing_feedback": {
+    "realm": "atmos_cmip",
+    "frequency": "mon",
+    "vars": ["ts","ta","hus","rsus","rsuscs","rsds","rsdscs","rsdt","rsut","rsutcs","rlut","rlutcs"]
   }
 }
