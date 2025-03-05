@@ -2,6 +2,7 @@
 import sys
 import os
 import json
+import copy
 
 # load pod information
 with open(sys.argv[1]+'runnable_pods.json') as f:
@@ -16,7 +17,7 @@ config_names = set([f"{pods[p]['realm']}_{pods[p]['frequency']}_config" for p in
 realms = set([f"{pods[p]['realm']}" for p in pods])
 config_files = {}
 for c in config_names:
-    config_files[c] = template_config
+    config_files[c] = copy.deepcopy(template_config)
     for r in realms:
         if r in c:
             config_files[c]['case_list']['case_name']['realm'] = r
@@ -27,7 +28,7 @@ for p in pods:
     config_file = f"{pods[p]['realm']}_{pods[p]['frequency']}_config"    
     config_files[config_file]['pod_list'].append(p) 
     
-
+#write out config files
 for c in config_files:
     with open(sys.argv[1]+f"config/{c}.jsonc", "w") as f:
         f.write(json.dumps(config_files[c], indent=2))     

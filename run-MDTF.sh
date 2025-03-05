@@ -6,7 +6,7 @@
 # dir references
 run_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 #mdtf_dir=/home/oar.gfdl.mdtf/mdtf/MDTF-diagnostics
-mdtf_dir=/home/Jacob.Mims/mdtf/MDTF-diagnostics
+mdtf_dir=/home/oar.gfdl.mdtf/mdtf/MDTF-diagnostics
 catbuilddir=/home/Jacob.Mims/CatalogBuilder/
 
 echo $run_dir

@@ -31,7 +31,7 @@ set mode = "GFDL"
 
 if (-d ${out_dir}/mdtf) then
   echo "Output directory already exists, removing"
-  rm -fR ${out_dir}/mdtf
+  rm -fr ${out_dir}/mdtf
 endif
 
 set ppdir = `echo ${in_data_dir} | sed 's|\(.*pp\).*|\1|'`
