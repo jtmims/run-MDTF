@@ -5,11 +5,8 @@
 
 # dir references
 run_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-#mdtf_dir=/home/oar.gfdl.mdtf/mdtf/MDTF-diagnostics
 mdtf_dir=/home/oar.gfdl.mdtf/mdtf/MDTF-diagnostics
-catbuilddir=/home/Jacob.Mims/CatalogBuilder/
-
-echo $run_dir
+activate=/home/oar.gfdl.mdtf/miniconda3/bin/activate
 
 #TEST: /archive/jpk/fre/FMS2024.02_OM5_20240819/CM4.5v01_om5b06_piC_noBLING_xrefine_test4/gfdl.ncrc5-intel23-prod-openmp/pp/ starts 0001
 
@@ -50,10 +47,10 @@ endyr=$4
 echo "looking for catalog in $ppdir"
 cat=$(grep -s -H "esmcat_version" $ppdir/*.json  | cut -d: -f1)
 if [[ "$cat" == "" ]]; then
-   activate=/home/oar.gfdl.mdtf/miniconda3/bin/activate
-   env=/nbhome/Aparna.Radhakrishnan/conda/envs/catalogbuilder
-   source $activate $env 
-   python $run_dir/scripts/cat_builder.py $catbuilddir $ppdir $outdir/catalog
+   env=/nbhome/fms/conda/envs/fre-cli
+   source $activate $env
+   fre catalog buildcatalog --overwrite --slow $ppdir $outdir/catalog 
+   #python $run_dir/scripts/cat_builder.py $catbuilddir $ppdir $outdir/catalog
    cat=$outdir/catalog.json
    echo "new catalog generated: $cat"
 else
@@ -61,7 +58,6 @@ else
 fi
 
 # search catalog for pod requirements
-activate=/home/oar.gfdl.mdtf/miniconda3/bin/activate
 env=/home/oar.gfdl.mdtf/miniconda3/envs/_MDTF_base
 source $activate $env
 python $run_dir/scripts/req_var_search.py $cat $run_dir/data/ $outdir/
