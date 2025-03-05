@@ -9,6 +9,11 @@
     "frequency": "day",
     "vars": ["rlut","pr","ua200","ua850","va200","va850"]
   },
+  "ocn_surf_flux_diag": {
+    "realm": "atmos_cmip",
+    "frequency": "day",
+    "vars": ["ts","psl","sfcWind","huss","hfls","pr"]
+  },
   "forcing_feedback": {
     "realm": "atmos_cmip",
     "frequency": "mon",
