@@ -36,4 +36,5 @@ endif
 
 set ppdir = `echo ${in_data_dir} | sed 's|\(.*pp\).*|\1|'`
 
-/home/Jacob.Mims/run-MDTF/run-MDTF.sh ${ppdir} ${out_dir}/mdtf $yr1 $yr2
+/home/oar.gfdl.mdtf/run-MDTF/run-MDTF.sh ${ppdir} ${out_dir}/mdtf $yr1 $yr2
+
