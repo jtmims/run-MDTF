@@ -39,7 +39,7 @@ while getopts "hi:o:s:e:p:" arg; do
          if [ -d "${OPTARG}" ]; then
             outdir="${OPTARG}"
          else
-            mdkir -p "${OPTARG}"
+            mkdir -p "${OPTARG}"
             outdir="${OPTARG}"
          fi
          ;;      
