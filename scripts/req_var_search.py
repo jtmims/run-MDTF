@@ -14,9 +14,17 @@ with open(sys.argv[2]+"req_var.json") as f:
 
 pod_passed = {}
 runnable_pods = {}
+requested_pods=[]
 
-print('searching catalog for POD requirements')
+if len(sys.argv) > 4:
+    for i in range (4, len(sys.argv)):
+        requested_pods.append(sys.argv[i])
+
+print(f"LOG: user requested PODs {requested_pods}")
+
 for p in req_vars:
+    if len(requested_pods) > 0 and p not in requested_pods:
+        continue
     pod_passed[p] = True
     query = {}
     query['realm'] = req_vars[p]['realm']

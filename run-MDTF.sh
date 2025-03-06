@@ -14,10 +14,12 @@ activate=/home/oar.gfdl.mdtf/miniconda3/bin/activate
 #TEST 2: /archive/djp/am5/am5f7b12r1/c96L65_am5f7b12r1_amip/gfdl.ncrc5-intel23-classic-prod-openmp/pp/ starts 1990
 
 usage() {
-   echo "USAGE: run-mdtf.sh -i /path/to/pp/dir/pp -o out_dir/mdtf -s startyr -e endyr"   
+   echo "USAGE: run-mdtf.sh -i /path/to/pp/dir/pp -o out_dir/mdtf -s startyr -e endyr"
+   echo "the -p option can be used to select which PODs to run instead of all"   
 }
 
 # handle arguments
+declare -a pods=()
 while getopts "hi:o:s:e:p:" arg; do
    case "${arg}" in
       h) 
@@ -77,7 +79,7 @@ fi
 # search catalog for pod requirements
 env=/home/oar.gfdl.mdtf/miniconda3/envs/_MDTF_base
 source $activate $env
-python $run_dir/scripts/req_var_search.py $cat $run_dir/data/ $outdir/
+python $run_dir/scripts/req_var_search.py $cat $run_dir/data/ $outdir/ "${pods[@]}"
 
 # edit template config file
 cp $run_dir/config/template_config.jsonc $outdir
