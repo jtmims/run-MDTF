@@ -6,6 +6,7 @@
 # dir references
 run_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 mdtf_dir=/home/oar.gfdl.mdtf/mdtf/MDTF-diagnostics
+#mdtf_dir=/home/Jacob.Mims/mdtf/MDTF-diagnostics
 activate=/home/oar.gfdl.mdtf/miniconda3/bin/activate
 
 #TEST: /archive/jpk/fre/FMS2024.02_OM5_20240819/CM4.5v01_om5b06_piC_noBLING_xrefine_test4/gfdl.ncrc5-intel23-prod-openmp/pp/ starts 0001
@@ -13,32 +14,48 @@ activate=/home/oar.gfdl.mdtf/miniconda3/bin/activate
 #TEST 2: /archive/djp/am5/am5f7b12r1/c96L65_am5f7b12r1_amip/gfdl.ncrc5-intel23-classic-prod-openmp/pp/ starts 1990
 
 usage() {
-   echo "USAGE: run-mdtf.sh /path/to/pp/dir/pp out_dir/mdtf startyr endyr"   
+   echo "USAGE: run-mdtf.sh -i /path/to/pp/dir/pp -o out_dir/mdtf -s startyr -e endyr"   
 }
 
 # handle arguments
-if [[ $# -ne 4 ]] ; then
-   usage
-   exit 0
-fi
-if [ -d $1 ]; then
-   ppdir=$1
-else
-   echo "ERROR: $1 is not a directory"
-   usage
-   exit
-fi
-if [ -d $2 ]; then
-   outdir=$2
-else
-   mkdir -p $2
-   outdir=$2
-fi
+while getopts "hi:o:s:e:p:" arg; do
+   case "${arg}" in
+      h) 
+         usage
+	 exit 
+         ;;
+      i) 
+         if [ -d $OPTARG ]; then
+            ppdir="${OPTARG}"
+         else
+            echo "ERROR: $1 is not a directory"
+            usage
+            exit
+         fi
+         ;;
+      o)
+         if [ -d "${OPTARG}" ]; then
+            outdir="${OPTARG}"
+         else
+            mdkir -p "${OPTARG}"
+            outdir="${OPTARG}"
+         fi
+         ;;      
+      s)
+        startyr="${OPTARG}"
+        ;;
+      e)
+        endyr="${OPTARG}"
+        ;;
+      p)
+        pods+=("$OPTARG")
+        ;;
+   esac
+done
+shift $((OPTIND-1))
 if ! [ -d $outdir/config ]; then
    mkdir -p $outdir/config
 fi
-startyr=$3
-endyr=$4
 
 # check to see if catalog exists
 #  ^..^
@@ -47,9 +64,9 @@ endyr=$4
 echo "looking for catalog in $ppdir"
 cat=$(grep -s -H "esmcat_version" $ppdir/*.json  | cut -d: -f1)
 if [[ "$cat" == "" ]]; then
-   env=/nbhome/fms/conda/envs/fre-cli
+   env=/nbhome/fms/conda/envs/fre-2025.01
    source $activate $env
-   fre catalog buildcatalog --overwrite --slow $ppdir $outdir/catalog 
+   fre catalog builder --overwrite $ppdir $outdir/catalog 
    #python $run_dir/scripts/cat_builder.py $catbuilddir $ppdir $outdir/catalog
    cat=$outdir/catalog.json
    echo "new catalog generated: $cat"
