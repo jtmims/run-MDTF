@@ -19,8 +19,9 @@ usage() {
 }
 
 # handle arguments
+tempdir=""
 declare -a pods=()
-while getopts "hi:o:s:e:p:" arg; do
+while getopts "hi:o:s:e:p:t:" arg; do
    case "${arg}" in
       h) 
          usage
@@ -44,21 +45,28 @@ while getopts "hi:o:s:e:p:" arg; do
          fi
          ;;      
       s)
-        startyr="${OPTARG}"
-        ;;
+         startyr="${OPTARG}"
+         ;;
       e)
-        endyr="${OPTARG}"
-        ;;
+         endyr="${OPTARG}"
+         ;;
       p)
-        pods+=("$OPTARG")
-        ;;
+         pods+=("$OPTARG")
+         ;;
+      t)
+         tempdir="${OPTARG}"
+         ;;
    esac
 done
 shift $((OPTIND-1))
 if ! [ -d $outdir/config ]; then
    mkdir -p $outdir/config
 fi
-
+if [ $tempdir != '' ]; then
+   wkdir=$tempdir
+else
+   wkdir=$outdir
+fi
 # check to see if catalog exists
 #  ^..^
 # /o  o\   
@@ -92,7 +100,10 @@ config='"DATA_CATALOG": "",'
 config_edit='"DATA_CATALOG": "'"${cat}"'",'
 sed -i "s|$config|$config_edit|ig" $f
 config='"WORK_DIR": "",'
-config_edit='"WORK_DIR": "'"${outdir}"'",'
+config_edit='"WORK_DIR": "'"${wkdir}"'",'
+sed -i "s|$config|$config_edit|ig" $f
+config='"OUTPUT_DIR": "",'
+config_edit='"OUTPUT_DIR": "'"${outdir}"'",'
 sed -i "s|$config|$config_edit|ig" $f
 config='"startdate": "",'
 config_edit='"startdate": "'"${startyr}"'",'
