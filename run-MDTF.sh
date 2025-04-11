@@ -20,8 +20,9 @@ usage() {
 
 # handle arguments
 tempdir=""
+pod_config=""
 declare -a pods=()
-while getopts "hi:o:s:e:p:t:" arg; do
+while getopts "hi:o:s:e:p:t:l:" arg; do
    case "${arg}" in
       h) 
          usage
@@ -56,17 +57,23 @@ while getopts "hi:o:s:e:p:t:" arg; do
       t)
          tempdir="${OPTARG}"
          ;;
+      l)
+         pod_config="${OPTARG}"
    esac
 done
 shift $((OPTIND-1))
 if ! [ -d $outdir/config ]; then
    mkdir -p $outdir/config
 fi
-if [ $tempdir != '' ]; then
-   wkdir=$tempdir
-else
+if [ -z $tempdir ]; then
    wkdir=$outdir
+else
+   wkdir=$tempdir
 fi
+if [ -z $pod_config ]; then 
+   pod_config="$run_dir/config/pod_config.json"
+fi
+
 # check to see if catalog exists
 #  ^..^
 # /o  o\   
@@ -77,23 +84,17 @@ if [[ "$cat" == "" ]]; then
    env=/nbhome/fms/conda/envs/fre-2025.01
    source $activate $env
    fre catalog builder --overwrite $ppdir $outdir/catalog 
-   #python $run_dir/scripts/cat_builder.py $catbuilddir $ppdir $outdir/catalog
    cat=$outdir/catalog.json
    echo "new catalog generated: $cat"
 else
    echo "found catalog: $cat"
 fi
 
-# search catalog for pod requirements
-env=/home/oar.gfdl.mdtf/miniconda3/envs/_MDTF_base
-source $activate $env
-python $run_dir/scripts/req_var_search.py $cat $run_dir/data/ $outdir/ "${pods[@]}"
-
 # edit template config file
 cp $run_dir/config/template_config.jsonc $outdir
 f=$outdir/template_config.jsonc
 if [ ! -f $f ]; then
-   echo "ERROR: failed to find $f; error with req_var_search.py"
+   echo "ERROR: failed to find $f"
    exit 0
 fi
 config='"DATA_CATALOG": "",'
@@ -113,8 +114,11 @@ config_edit='"enddate": "'"${endyr}"'"'
 sed -i "s|$config|$config_edit|ig" $f
 echo "edited file $f"
 
+# load mdtf base conda env
+env=/home/oar.gfdl.mdtf/miniconda3/envs/_MDTF_base
+source $activate $env
 #generate config files
-python $run_dir/scripts/gen_config.py $outdir/
+python $run_dir/scripts/gen_config.py $outdir/ $pod_config
 
 # launch the mdtf with the config files
 for f in $(ls ${outdir}/config) ; do
@@ -122,23 +126,9 @@ for f in $(ls ${outdir}/config) ; do
    "$mdtf_dir"/mdtf -f $outdir/config/$f
 done
 
-# consolidate into a single output folder
-mapfile -t pods < $run_dir/data/pods.txt
-for od in "$outdir"/"MDTF_output.v"*; do
-   for pd in $od/*; do
-      if [ -d $pd ]; then
-         pod=$(basename "$pd")
-         for name in ${pods[@]}; do
-            if [[ "$pod" == "$name" ]]; then
-              mv $pd "$outdir"/"MDTF_output"
-            fi
-         done
-      fi
-   done
-   if [ -f "$od"/"index.html" ]; then
-      cat "$od"/"index.html" >> "$outdir"/"MDTF_output"/"index.html"
-   fi
-   rm -rf $od
-done
+# consolidate outputs into index
+cp $run_dir/scripts/index.html $outdir/
+cp $run_dir/scripts/mdtf_diag_banner.png $outdir/
+python $run_dir/scripts/gen_index.py $outdir/ $pod_config
 
 exit 0
