@@ -15,7 +15,8 @@ activate=/home/oar.gfdl.mdtf/miniconda3/bin/activate
 
 usage() {
    echo "USAGE: run-mdtf.sh -i /path/to/pp/dir/pp -o out_dir/mdtf -s startyr -e endyr"
-   echo "the -p option can be used to select which PODs to run instead of all"   
+   echo "ADDITONAL OPTS:"
+   echo "-l: custom config file for pods (default: config/pod_config.json) this can be used to set which PODs you would like to run and define the realm to grab vars from"
 }
 
 # handle arguments
